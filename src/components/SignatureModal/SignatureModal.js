@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classNames from 'classNames';
 import { translate } from 'react-i18next';
 
+import Modal from 'components/Modal';
 import ActionButton from 'components/ActionButton';
 
 import core from 'core';
-import getClassName from 'helpers/getClassName';
 import defaultTool from 'constants/defaultTool';
 import actions from 'actions';
-import selectors from 'selectors';
 
 import './SignatureModal.scss';
 
@@ -21,7 +21,6 @@ class SignatureModal extends React.PureComponent {
     openElement: PropTypes.func.isRequired,
     setCursorOverlay: PropTypes.func.isRequired,
     closeElement: PropTypes.func.isRequired,
-    closeElements: PropTypes.func.isRequired
   }
 
   constructor(props) {
@@ -41,16 +40,6 @@ class SignatureModal extends React.PureComponent {
     window.addEventListener('orientationchange', this.setSignatureCanvasSize);
   }
 
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isOpen && this.props.isOpen) {
-      core.setToolMode('AnnotationCreateSignature');
-      this.setState(this.initialState);
-      this.signatureTool.clearSignatureCanvas();
-      this.signatureTool.openSignature();
-      this.props.closeElements([ 'printModal', 'loadingModal', 'progressModal', 'errorModal' ]); 
-    }
-  }
-
   componentWillUnmount() {
     window.removeEventListener('resize', this.setSignatureCanvasSize);
     window.removeEventListener('orientationchange', this.setSignatureCanvasSize);
@@ -62,12 +51,10 @@ class SignatureModal extends React.PureComponent {
     // draw nothing in the background since we want to convert the signature on the canvas
     // to an image and we don't want the background to be in the image.
     this.signatureTool.drawBackground = () => {};
+    this.setSignatureCanvasSize();
     
     const multiplier = window.utils.getCanvasMultiplier();
     canvas.getContext('2d').scale(multiplier, multiplier);   
-    canvas.addEventListener('mouseup', this.handleFinishDrawing);
-    canvas.addEventListener('touchend', this.handleFinishDrawing);
-    this.setSignatureCanvasSize();
   }
 
   setSignatureCanvasSize = () => {
@@ -75,6 +62,15 @@ class SignatureModal extends React.PureComponent {
     const { width, height } = canvas.getBoundingClientRect();
     canvas.width = width;
     canvas.height = height;
+  }
+
+  handleVisibilityChange = isVisible => {
+    if (isVisible) {
+      core.setToolMode('AnnotationCreateSignature');
+      this.setState(this.initialState);
+      this.signatureTool.clearSignatureCanvas();
+      this.signatureTool.openSignature();
+    }
   }
 
   handleFinishDrawing = e => {
@@ -126,27 +122,35 @@ class SignatureModal extends React.PureComponent {
   }
 
   render() {
-    const { canClear } = this.state;
-    const { isDisabled, t } = this.props;
-    const className = getClassName('Modal SignatureModal', this.props);
-
-    if (isDisabled) {
-      return null;
-    }
+    const { t } = this.props;
+    const clearBtnClassName = classNames('signature-clear', {
+      'active': this.state.canClear
+    });
 
     return (
-      <div className={className} onClick={this.closeModal}>
-        <div className="container" onClick={e => e.stopPropagation()} onMouseUp={this.handleFinishDrawing}>
+      <Modal
+        className="SignatureModal"
+        dataElement="signatureModal"
+        onVisibilityChange={this.handleVisibilityChange}
+        closeWhenClickOutside
+      >
+        <div className="container" onMouseUp={this.handleFinishDrawing}>
           <div className="header">
             <ActionButton dataElement="signatureModalCloseButton" title="action.close" img="ic_close_black_24px" onClick={this.closeModal} />
           </div>
           <div className="signature">
-            <canvas className="signature-canvas" ref={this.canvas}></canvas>
+            <canvas 
+              className="signature-canvas" 
+              ref={this.canvas} 
+              onTouchEnd={this.handleFinishDrawing} 
+              onMouseUp={this.handleFinishDrawing}
+            >
+            </canvas>
             <div className="signature-background">
               <div className="signature-sign-here">
                 {t('message.signHere')}
               </div>
-              <div className={`signature-clear ${canClear ? 'active': null}`} onClick={this.clearCanvas}>
+              <div className={clearBtnClassName} onClick={this.clearCanvas}>
                 {t('action.clear')}
               </div>
             </div>
@@ -159,21 +163,15 @@ class SignatureModal extends React.PureComponent {
             <div className="signature-create" onClick={this.createSignature}>{t('action.create')}</div>
           </div>
         </div>
-      </div>
+      </Modal>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  isDisabled: selectors.isElementDisabled(state, 'signatureModal'),
-  isOpen: selectors.isElementOpen(state, 'signatureModal'),
-});
-
 const mapDispatchToProps = {
   openElement: actions.openElement,
   setCursorOverlay: actions.setCursorOverlay, 
-  closeElement: actions.closeElement,
-  closeElements: actions.closeElements
+  closeElement: actions.closeElement
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(SignatureModal));
+export default connect(null, mapDispatchToProps)(translate()(SignatureModal));
