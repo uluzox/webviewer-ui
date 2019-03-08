@@ -13,10 +13,10 @@ class Modal extends React.PureComponent {
   static propTypes = {
     dataElement: PropTypes.string.isRequired,
     closeElements: PropTypes.func.isRequired,
-    onClickOutside: PropTypes.bool.isRequired,
+    onClickOutside: PropTypes.func.isRequired,
+    onVisibilityChange: PropTypes.func.isRequired,
     children: PropTypes.element.isRequired,
     className: PropTypes.string,
-    onVisibilityChange: PropTypes.func,
     isOpen: PropTypes.bool,
     isDisabled: PropTypes.bool,
   }
