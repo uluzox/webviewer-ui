@@ -2,8 +2,6 @@
 @import '../../constants/modal';
 
 .ProgressModal {
-  @extend %modal;
-  
   .container {
     @extend %modal-shared-container-style;
     display: flex;

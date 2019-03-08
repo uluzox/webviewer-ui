@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 import { translate } from 'react-i18next';
 import dayjs from 'dayjs';
 
+import Modal from 'components/Modal';
 import Input from 'components/Input';
 
 import core from 'core';
 import getPagesToPrint from 'helpers/getPagesToPrint';
-import getClassName from 'helpers/getClassName';
 import { getSortStrategies } from 'constants/sortStrategies';
 import actions from 'actions';
 import selectors from 'selectors';
@@ -19,21 +19,18 @@ import { mapAnnotationToKey, getDataWithKey } from '../../constants/map';
 class PrintModal extends React.PureComponent {
   static propTypes = {
     isEmbedPrintSupported: PropTypes.bool,
-    isDisabled: PropTypes.bool,
-    isOpen: PropTypes.bool,
     currentPage: PropTypes.number,
     printQuality: PropTypes.number.isRequired,
     pageLabels: PropTypes.array.isRequired,
     closeElement: PropTypes.func.isRequired,
     dispatch: PropTypes.func.isRequired,
-    closeElements: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
     sortStrategy: PropTypes.string.isRequired,
     colorMap: PropTypes.object.isRequired,
   }
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.allPages = React.createRef();
     this.currentPage = React.createRef();
     this.customPages = React.createRef();
@@ -46,10 +43,9 @@ class PrintModal extends React.PureComponent {
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isOpen && this.props.isOpen) {
+  handleVisibilityChange = isVisible => {
+    if (isVisible) {
       this.onChange();
-      this.props.closeElements([ 'signatureModal', 'loadingModal', 'progressModal', 'errorModal' ]);
     }
   }
 
@@ -338,20 +334,19 @@ class PrintModal extends React.PureComponent {
   }
 
   render() {
-    const { isDisabled, t } = this.props;
-
-    if (isDisabled) {
-      return null;
-    }
-
+    const { t } = this.props;
     const { count, pagesToPrint } = this.state;
-    const className = getClassName('Modal PrintModal', this.props);
     const customPagesLabelElement = <input ref={this.customInput} type="text" placeholder={t('message.customPrintPlaceholder')} onFocus={this.onFocus}/>;
     const isPrinting = count >= 0;
 
     return (
-      <div className={className} data-element="printModal" onClick={this.closePrintModal}>
-          <div className="container" onClick={e => e.stopPropagation()}>
+      <Modal
+        className="PrintModal"
+        dataElement="printModal"
+        onVisibilityChange={this.handleVisibilityChange}
+        onClickOutside={this.closePrintModal}
+      >
+        <div className="container" onClick={e => e.stopPropagation()}>
           <div className="settings">
             <div className="col">{`${t('option.print.pages')}:`}</div>
             <form className="col" onChange={this.onChange} onSubmit={this.createPagesAndPrint}>
@@ -375,15 +370,13 @@ class PrintModal extends React.PureComponent {
             }
           </div>
         </div>
-      </div>
+      </Modal>
     );
   }
 }
 
 const mapStateToProps = state => ({
   isEmbedPrintSupported: selectors.isEmbedPrintSupported(state),
-  isDisabled: selectors.isElementDisabled(state, 'printModal'),
-  isOpen: selectors.isElementOpen(state, 'printModal'),
   currentPage: selectors.getCurrentPage(state),
   printQuality: selectors.getPrintQuality(state),
   pageLabels: selectors.getPageLabels(state),
@@ -394,7 +387,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   dispatch,
   closeElement: dataElement => dispatch(actions.closeElement(dataElement)),
-  closeElements: dataElements => dispatch(actions.closeElements(dataElements))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate()(PrintModal));

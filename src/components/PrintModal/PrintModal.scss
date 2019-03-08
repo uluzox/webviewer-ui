@@ -2,8 +2,6 @@
 @import '../../constants/modal';
 
 .PrintModal {
-  @extend %modal;
-
   .container {
     @extend %modal-shared-container-style;
 
