@@ -30,6 +30,13 @@ class Modal extends React.PureComponent {
     super(props);
   }
 
+  componentDidMount() {
+    warning(
+      MODALS.includes(this.props.dataElement),
+      'Please add the dataElement of the modal component you are developing to the MODALS array in Modal.js so that this modal can be closed when other modal opens'
+    );
+  }
+
   componentDidUpdate(prevProps) {
     const { 
       onVisibilityChange, 
@@ -41,11 +48,6 @@ class Modal extends React.PureComponent {
       onVisibilityChange(this.props.isOpen);
 
       if (this.props.isOpen) {
-        warning(
-          MODALS.includes(dataElement),
-          'Please add the dataElement of the modal component you are developing to the MODALS array in Modal.js so that this modal can be closed when other modal opens'
-        );
-
         const modalsToClose = MODALS.filter(modal => modal !== dataElement);
         closeElements(modalsToClose);
       }
