@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next';
 
-import getClassName from 'helpers/getClassName';
+import Modal from 'components/Modal';
 import actions from 'actions';
 import selectors from 'selectors';
 
@@ -11,10 +11,7 @@ import './ErrorModal.scss';
 
 class ErrorModal extends React.PureComponent {
   static propTypes = {
-    isDisabled: PropTypes.bool,
-    isOpen: PropTypes.bool,
     openElement: PropTypes.func.isRequired,
-    closeElements: PropTypes.func.isRequired,
     documentPath: PropTypes.string.isRequired,
     t: PropTypes.func.isRequired
   }
@@ -25,12 +22,6 @@ class ErrorModal extends React.PureComponent {
 
   componentDidMount() {
     window.addEventListener('loaderror', this.onError);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElements([ 'signatureModal', 'printModal', 'loadingModal', 'progressModal' ]);
-    }
   }
 
   componentWillUnmount() {
@@ -54,30 +45,20 @@ class ErrorModal extends React.PureComponent {
   }
 
   render() {
-    if (this.props.isDisabled) {
-      return null;
-    }
-
-    const { errorMessage } = this.state;
-    const className = getClassName('Modal ErrorModal', this.props);
-
     return (
-      <div className={className} data-element="errorModal">
-        <div className="container">{errorMessage}</div>
-      </div>
+      <Modal className="ErrorModal" dataElement="errorModal">
+        <div className="container">{this.state.errorMessage}</div>
+      </Modal>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  isDisabled: selectors.isElementDisabled(state, 'errorModal'),
-  isOpen: selectors.isElementOpen(state, 'errorModal'),
   documentPath: selectors.getDocumentPath(state)
 });
 
 const mapDispatchToProps = {
-  openElement: actions.openElement,
-  closeElements: actions.closeElements,
+  openElement: actions.openElement
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate()(ErrorModal));
