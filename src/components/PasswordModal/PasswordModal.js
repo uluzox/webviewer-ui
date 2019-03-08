@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { translate } from 'react-i18next';
 
+import Modal from 'components/Modal';
 import Button from 'components/Button';
 
-import getClassName from 'helpers/getClassName';
 import actions from 'actions';
 import selectors from 'selectors';
 
@@ -13,16 +13,14 @@ import './PasswordModal.scss';
 
 class PasswordModal extends React.PureComponent {
   static propTypes = {
-    isOpen: PropTypes.bool,
     attempt: PropTypes.number.isRequired,
     checkPassword: PropTypes.func,
     setPasswordAttempts: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired,
-    closeElement: PropTypes.func.isRequired
   }
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.maxAttempts = 3;
     this.passwordInput = React.createRef();
     this.initialState = {
@@ -32,15 +30,13 @@ class PasswordModal extends React.PureComponent {
     this.state = this.initialState;
   }
 
-  componentDidUpdate(prevProps) {
-    if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElement('progressModal');
-    }
-    if (prevProps.isOpen && !this.props.isOpen) {
+  handleVisibilityChange = isVisible => {
+    if (!isVisible) {
       // when a user enters the correct password or calls core.closeDocument
       // reset state in case user loads another password-protected document
       this.setState(this.initialState);
     }
+
     if (this.passwordInput.current) {
       this.passwordInput.current.focus();
     }
@@ -124,27 +120,27 @@ class PasswordModal extends React.PureComponent {
   }
 
   render() {
-    const className = getClassName('Modal PasswordModal', this.props);
-
     return (
-      <div className={className} data-element="passwordModal">
+      <Modal 
+        className="PasswordModal"
+        dataElement="passwordModal"
+        onVisibilityChange={this.handleVisibilityChange}
+      >
         <div className="container">
           {this.renderContent()}
         </div>
-      </div>
+      </Modal>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  isOpen: selectors.isElementOpen(state, 'passwordModal'),
   checkPassword: selectors.getCheckPasswordFunction(state),
   attempt: selectors.getPasswordAttempts(state)
 });
 
 const mapDispatchToProps = {
   setPasswordAttempts: actions.setPasswordAttempts,
-  closeElement: actions.closeElement
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate()(PasswordModal));
