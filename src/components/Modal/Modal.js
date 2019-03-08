@@ -13,7 +13,7 @@ class Modal extends React.PureComponent {
   static propTypes = {
     dataElement: PropTypes.string.isRequired,
     closeElements: PropTypes.func.isRequired,
-    closeWhenClickOutside: PropTypes.bool.isRequired,
+    onClickOutside: PropTypes.bool.isRequired,
     children: PropTypes.element.isRequired,
     className: PropTypes.string,
     onVisibilityChange: PropTypes.func,
@@ -22,7 +22,7 @@ class Modal extends React.PureComponent {
   }
 
   static defaultProps = {
-    closeWhenClickOutside: false,
+    onClickOutside: () => {},
     onVisibilityChange: () => {}
   }
 
@@ -53,17 +53,8 @@ class Modal extends React.PureComponent {
   }
 
   handleClickOutside = e => {
-    const { 
-      closeWhenClickOutside, 
-      closeElements, 
-      dataElement 
-    } = this.props;
-
-    if (
-      closeWhenClickOutside &&
-      e.target === e.currentTarget
-    ) {
-      closeElements([dataElement]);
+    if (e.target === e.currentTarget) {
+      this.props.onClickOutside();
     }
   }
 

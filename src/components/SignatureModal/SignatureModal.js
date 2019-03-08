@@ -132,7 +132,7 @@ class SignatureModal extends React.PureComponent {
         className="SignatureModal"
         dataElement="signatureModal"
         onVisibilityChange={this.handleVisibilityChange}
-        closeWhenClickOutside
+        onClickOutside={this.closeModal}
       >
         <div className="container" onMouseUp={this.handleFinishDrawing}>
           <div className="header">

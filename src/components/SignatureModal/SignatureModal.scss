@@ -5,7 +5,6 @@
 $signature-modal-shared-color: #E1E1E3;
 
 .SignatureModal {
-  @extend %modal;
   font-family: SourceSansPro-Regular;
 
   .container {
