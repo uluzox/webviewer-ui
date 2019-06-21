@@ -26,7 +26,11 @@ class CursorOverlay extends React.PureComponent {
   constructor(props) {
     super(props);
     this.overlay = React.createRef();
-    this.state = { top: 0, left: 0 };
+    this.initialState = {
+      top: -9999,
+      left: -9999,
+    };
+    this.state = this.initialState;
   }  
 
   componentDidMount() {
@@ -74,10 +78,7 @@ class CursorOverlay extends React.PureComponent {
   handleMouseLeave = () => {
     // we use -9999 to "hide" this overlay here instead of calling this.props.closeElement('cursorOverlay')
     // is because by doing so we don't need to handle extra logic like when we should call this.props.openElement('cursorOverlay')
-    this.setState({
-      left: -9999,
-      top: -9999
-    });
+    this.setState(this.initialState);
   }
 
   render() {

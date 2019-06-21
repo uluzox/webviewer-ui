@@ -45,11 +45,20 @@ class SignatureOverlay extends React.PureComponent {
     this.signatureTool.on('saveDefault', this.onSaveDefault);
     core.addEventListener('annotationChanged', this.onAnnotationChanged);
     window.addEventListener('resize', this.handleWindowResize);
+
+    let defaultSignatures = this.parseSignatures(localStorage.getItem('signatures'));
+    if (defaultSignatures.length) {
+      this.setState({
+        defaultSignatures
+      });
+
+      this.signatureTool.trigger('saveDefault.sigTool');
+    }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (!prevProps.isOpen && this.props.isOpen) {
-      this.props.closeElements(['viewControlsOverlay', 'searchOverlay', 'menuOverlay', 'toolsOverlay', 'zoomOverlay', 'toolStylePopup']);
+      this.props.closeElements([ 'viewControlsOverlay', 'searchOverlay', 'menuOverlay', 'toolsOverlay', 'zoomOverlay', 'toolStylePopup' ]);
       this.setOverlayPosition();
     }
 
@@ -65,6 +74,10 @@ class SignatureOverlay extends React.PureComponent {
       // however the overlay will be closed without any default signature selected if we clicked the "add signature" button(which opens the signature modal)
       // we don't want to clear the location in the case because we still want the signature to be automatically added to the widget after the create button is hit in the modal 
       this.signatureTool.clearLocation();
+    }
+
+    if (prevState.defaultSignatures !== this.state.defaultSignatures) {
+      localStorage.setItem('signatures', JSON.stringify(this.state.defaultSignatures));
     }
   }
 
@@ -84,6 +97,25 @@ class SignatureOverlay extends React.PureComponent {
       // TODO: remove the hard-coded value. 
       left: left === -9999 ? window.innerWidth / 2 - 95 : left - 95,
       right 
+    });
+  }
+
+  parseSignatures = signatures => {
+    if (!signatures) {
+      return [];
+    }
+
+    return JSON.parse(signatures).map(({ imgSrc, paths, styles }) => {
+      const { R, G, B, A } = styles.StrokeColor;
+
+      return {
+        imgSrc,
+        paths: paths.map(path => path.map(p => new window.Annotations.Point(p.x, p.y))),
+        styles: {
+          ...styles,
+          StrokeColor: new window.Annotations.Color(R, G, B, A)
+        }
+      };
     });
   }
 
