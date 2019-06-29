@@ -186,7 +186,6 @@ export default {
     officeType: getHashParams('office', 'auto'),
     isOffline: getHashParams('startOffline', false),
     totalPages: 0,
-    outlines: [],
     layers: [],
     checkPassword: null,
     password: '',

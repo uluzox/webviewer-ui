@@ -22,7 +22,7 @@ export const isElementOpen = (state, dataElement) => {
 };
 
 export const isElementActive = (state, tool) => {
-  const { viewer: { activeToolName, header: { tools = [] }  }} = state;
+  const { viewer: { activeToolName, header: { tools = [] }  } } = state;
   const { element, dataElement } = tool;
 
   return isElementOpen(state, element) || tools.some(tool => tool.dataElement === dataElement && tool.toolName === activeToolName);
@@ -128,7 +128,6 @@ export const getCheckPasswordFunction = state => state.document.checkPassword;
 export const getPasswordAttempts = state => state.document.passwordAttempts;
 export const getPrintQuality = state => state.document.printQuality;
 export const getTotalPages = state => state.document.totalPages;
-export const getOutlines = state => state.document.outlines;
 export const getLayers = state => state.document.layers;
 export const getLoadingProgress = state => Math.min(state.document.documentLoadingProgress, state.document.workerLoadingProgress);
 export const getUploadProgress = state => state.document.uploadProgress;

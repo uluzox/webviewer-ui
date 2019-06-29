@@ -269,7 +269,6 @@ if (window.CanvasRenderingContext2D) {
           toggleElement: apis.toggleElement(store),
           toggleFullScreen: apis.toggleFullScreen,
           unregisterTool: apis.unregisterTool(store),
-          updateOutlines: apis.updateOutlines(store), // undocumented
           updateTool: apis.updateTool(store),
           useEmbeddedPrint: apis.useEmbeddedPrint(store),
         };

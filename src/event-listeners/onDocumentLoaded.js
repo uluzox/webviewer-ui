@@ -35,10 +35,6 @@ export default dispatch => () => {
     enableAnnotations: getHashParams('a', false)
   });
 
-  core.getOutlines(outlines => {
-    dispatch(actions.setOutlines(outlines));
-  });
-
   const doc = core.getDocument();
   if (!doc.isWebViewerServerDocument()) {
     doc.getLayersArray().then(layers => {

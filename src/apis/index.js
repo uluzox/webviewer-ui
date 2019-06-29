@@ -102,7 +102,6 @@ import showWarningMessage from './showWarningMessage';
 import toggleElement from './toggleElement';
 import toggleFullScreen from './toggleFullScreen';
 import unregisterTool from './unregisterTool';
-import updateOutlines from './updateOutlines';
 import updateTool from './updateTool';
 import useEmbeddedPrint from './useEmbeddedPrint';
 
@@ -211,7 +210,6 @@ export default {
   toggleElement,
   toggleFullScreen,
   unregisterTool,
-  updateOutlines,
   updateTool,
   useEmbeddedPrint,
 };
