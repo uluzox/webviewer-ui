@@ -5,6 +5,7 @@ import { translate } from 'react-i18next';
 
 import Outline from 'components/Outline';
 
+import core from 'core';
 import getClassName from 'helpers/getClassName';
 import selectors from 'selectors';
 
@@ -12,15 +13,45 @@ import './OutlinesPanel.scss';
 
 class OutlinesPanel extends React.PureComponent {
   static propTypes = {
-    outlines: PropTypes.arrayOf(PropTypes.object),
     display: PropTypes.string.isRequired,
     isDisabled: PropTypes.bool,
     t: PropTypes.func.isRequired
   }
 
+  state = {
+    outlines: []
+  }  
+
+  componentDidMount() {
+    core.addEventListener('documentLoaded', this.updateOutlines);
+    core.addEventListener('documentUnloaded', this.resetOutlines);
+  }
+
+  componentWillUnmount() {
+    core.removeEventListener('documentLoaded', this.updateOutlines);
+    core.removeEventListener('documentUnloaded', this.resetOutlines);
+  }
+
+  updateOutlines = () => {
+    core.getOutlines().then(outlines => {
+      this.setState({ outlines });
+    });
+  }
+
+  resetOutlines = () => {
+    this.setState({
+      outlines: []
+    });
+  }
+
   render() {
-    const { isDisabled, outlines, t, display } = this.props;
-    
+    const { 
+      isDisabled, 
+      t, 
+      display 
+    } = this.props;
+    const { outlines } = this.state;
+
     if (isDisabled) {
       return null;
     }
@@ -42,7 +73,6 @@ class OutlinesPanel extends React.PureComponent {
 }
 
 const mapStateToProps = state => ({
-  outlines: selectors.getOutlines(state),
   isDisabled: selectors.isElementDisabled(state, 'outlinePanel')
 });
 
