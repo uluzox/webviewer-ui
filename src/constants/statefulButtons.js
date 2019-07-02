@@ -36,12 +36,12 @@ export default {
       },
       defaultSignature: {
         img: 'ic_annotation_signature_black_24px',
-        onClick: (update, state, dispatch) => {
-          dispatch(actions.toggleElement('signatureOverlay'));
+        onClick: () => {
+          core.getTool('AnnotationCreateSignature').trigger('addImmediately');
         },
         title: 'annotation.signature' ,
         isActive: ({ openElements }) => openElements.signatureOverlay,
-        className: 'down-arrow'
+        // className: 'down-arrow'
       }
     }
   }

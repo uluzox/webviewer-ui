@@ -27,9 +27,7 @@ export default store => () => {
       const isSignatureOverlayDisabled = selectors.isElementDisabled(store.getState(), 'signatureOverlay');
 
       if (defaultSignatures && !isSignatureOverlayDisabled) {
-        setTimeout(() => {
-          store.dispatch(actions.openElement('signatureOverlay'));
-        }, 0);
+        this.signatureTool.trigger('addImmediately');
       } else {
         store.dispatch(actions.openElement('signatureModal'));
       }

@@ -43,6 +43,7 @@ class SignatureOverlay extends React.PureComponent {
 
   componentDidMount() {
     this.signatureTool.on('saveDefault', this.onSaveDefault);
+    this.signatureTool.on('addImmediately', this.onAddImmediately);
     core.addEventListener('annotationChanged', this.onAnnotationChanged);
     window.addEventListener('resize', this.handleWindowResize);
 
@@ -83,6 +84,7 @@ class SignatureOverlay extends React.PureComponent {
 
   componentWillUnmount() {
     this.signatureTool.off('saveDefault', this.onSaveDefault);
+    this.signatureTool.off('addImmediately', this.onAddImmediately);
     core.removeEventListener('annotationChanged', this.onAnnotationChanged);
     window.removeEventListener('resize', this.handleWindowResize);
   }
@@ -134,6 +136,14 @@ class SignatureOverlay extends React.PureComponent {
     defaultSignatures.push(savedSignature);
 
     this.setState({ defaultSignatures });
+  }
+
+  onAddImmediately = () => {
+    if (this.state.defaultSignatures.length) {
+      this.setUpSignature(0);
+    } else {
+      this.props.openElement('signatureModal');
+    }
   }
 
   onAnnotationChanged = (e, annotations, action) => {
